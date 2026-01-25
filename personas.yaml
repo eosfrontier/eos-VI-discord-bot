@@ -1,0 +1,25 @@
+vis:
+  - id: Shrimp
+    name: "5HR iMP"
+    avatarUrl: "https://cdn.discordapp.com/emojis/1185370907439529995.webp?size=128"
+    accentColor: "#b91c1c"
+  - id: b33_n1c3
+    name: "B33-N1C3"
+    avatarUrl: "https://cdn.discordapp.com/emojis/1180961999484620810.webp?size=128"
+    accentColor: "#c60aff"
+  - id: io_Otter
+    name: "I/O 0T73R"
+    avatarUrl: "https://cdn.discordapp.com/emojis/1180962056707514429.webp?size=128"
+    accentColor: "#04d9ee"
+  - id: lola
+    name: "LOLA"
+    avatarUrl: "https://cdn.discordapp.com/emojis/1371568792731254834.webp?size=128"
+    accentColor: "#1d4ed8"
+  - id: Don_Dragon
+    name: "D0N D5460N"
+    avatarUrl: "https://cdn.discordapp.com/emojis/1185369825271365772.webp?size=128"
+    accentColor: "#f6c344"
+  - id: Pavel
+    name: "P4V37"
+    avatarUrl: "https://cdn.discordapp.com/emojis/1185370542010814474.webp?size=128"
+    accentColor: "#e6f1ff"
