@@ -49,10 +49,7 @@ personas = load_personas()
 
 
 async def ensure_channel_webhook_url(channel: discord.TextChannel) -> str:
-    """
-    Create (or reuse) an incoming webhook in this channel, and cache its URL.
-    Requires MANAGE_WEBHOOKS permission to create webhooks. :contentReference[oaicite:7]{index=7}
-    """
+
     cache = load_webhook_cache()
     key = str(channel.id)
 
@@ -99,10 +96,8 @@ async def post_via_webhook(
     "allowed_mentions": {"parse": []},
     "embeds": [
             {
-            "title": "📡 TRANSMISSION",
-            "description": to_monospace_block(content),
+            "description": content,
             "color": hex_to_int(accent_color),
-            "footer": {"text": "// " + username},
             }
         ],
     }
