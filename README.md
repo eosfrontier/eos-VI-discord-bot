@@ -5,7 +5,7 @@ A lightweight Discord bot that lets SLs speak as multiple in-universe VIs using 
 **How it works**
 
 - The bot exposes a slash command: `/vi`
-- Only users with the configured SL role can invoke it
+- Only users with the configured SL role can invoke it.
 - The bot posts messages appears as the selected VI (name + avatar)
 
 ---
