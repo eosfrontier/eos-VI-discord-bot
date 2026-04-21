@@ -1,4 +1,4 @@
 aiohttp
-discord
+discord.py
 PyYAML
 python-dotenv
