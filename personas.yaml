@@ -29,3 +29,13 @@ vis:
     hidden: true
     avatarUrl: "https://media.discordapp.net/attachments/1414699780843507814/1509913977399017532/knifey.png?ex=6a1ae879&is=6a1996f9&hm=f342f0f2b5a576d86d582dd1e3953313c1bd04c21e2f928f11ee14938f993d8c&=&format=webp&quality=lossless&width=960&height=960"
     accentColor: "#d946ef"
+  - id: talon_platform
+    name: "TALON PLATFORM"
+    avatarUrl: "https://cdn.discordapp.com/app-icons/1484612102378225725/e645f6558c1f0380c69048d234ec112a.png?size=512"
+    accentColor: "#18d4d4"
+    hidden: true
+    aliases:
+      - talon
+      - talonplatform
+      - talon platform
+      - talon_platform

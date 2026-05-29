@@ -141,13 +141,15 @@ async def vi(interaction: discord.Interaction, vi: str, message: str):
             ephemeral=True,
         )
 
-    if vi not in personas:
+    resolved_vi = resolve_persona_id(vi)
+
+    if resolved_vi is None:
         return await interaction.response.send_message(
             "Unknown VI. Try again and pick a valid one.",
             ephemeral=True,
         )
 
-    persona = personas[vi]
+    persona = personas[resolved_vi]
 
     thread_id = None
     channel = interaction.channel
@@ -183,20 +185,46 @@ async def vi(interaction: discord.Interaction, vi: str, message: str):
 
 @vi.autocomplete("vi")
 async def vi_autocomplete(interaction: discord.Interaction, current: str):
-    current_lower = (current or "").lower()
+    current_normalized = normalize_persona_key(current or "")
     results = []
 
     for vid, p in personas.items():
         if p.get("hidden", False):
             continue
 
-        if current_lower in p["name"].lower() or current_lower in vid.lower():
+        candidates = [
+            vid,
+            p.get("name", ""),
+            *p.get("aliases", []),
+        ]
+
+        if any(current_normalized in normalize_persona_key(candidate) for candidate in candidates):
             results.append(app_commands.Choice(name=p["name"], value=vid))
 
         if len(results) >= 25:
             break
 
     return results
+
+def normalize_persona_key(value: str) -> str:
+    return "".join(ch for ch in value.casefold() if ch.isalnum())
+
+
+def resolve_persona_id(value: str) -> str | None:
+    wanted = normalize_persona_key(value)
+
+    for persona_id, persona in personas.items():
+        candidates = [
+            persona_id,
+            persona.get("name", ""),
+            *persona.get("aliases", []),
+        ]
+
+        for candidate in candidates:
+            if normalize_persona_key(candidate) == wanted:
+                return persona_id
+
+    return None
 
 
 if __name__ == "__main__":
