@@ -23,3 +23,9 @@ vis:
     name: "P4V37"
     avatarUrl: "https://cdn.discordapp.com/emojis/1185370542010814474.webp?size=128"
     accentColor: "#e6f1ff"
+  - id: knifey
+    name: "Knifey"
+    category: "easter_egg"
+    hidden: true
+    avatarUrl: "https://media.discordapp.net/attachments/1414699780843507814/1509885959506890943/knifey.png?ex=6a1ace61&is=6a197ce1&hm=c099e45f4aedc22b12b605bfb42d3d2ae3428906222749bf0d2c6cbeb88720df&=&format=webp&quality=lossless&width=713&height=739"
+    accentColor: "#d946ef"

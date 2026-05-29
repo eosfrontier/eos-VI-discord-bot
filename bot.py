@@ -185,11 +185,17 @@ async def vi(interaction: discord.Interaction, vi: str, message: str):
 async def vi_autocomplete(interaction: discord.Interaction, current: str):
     current_lower = (current or "").lower()
     results = []
+
     for vid, p in personas.items():
+        if p.get("hidden", False):
+            continue
+
         if current_lower in p["name"].lower() or current_lower in vid.lower():
             results.append(app_commands.Choice(name=p["name"], value=vid))
+
         if len(results) >= 25:
             break
+
     return results
 
 
