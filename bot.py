@@ -84,6 +84,7 @@ async def post_via_webhook(
     avatar_url: str | None,
     thread_id: int | None,
     accent_color: str | None,
+    style: str = "embed",
 ):
     params = ["wait=true"]
     if thread_id:
@@ -91,16 +92,24 @@ async def post_via_webhook(
     url = webhook_url + "?" + "&".join(params)
 
     payload = {
-    "username": username,
-    "avatar_url": avatar_url,
-    "allowed_mentions": {"parse": []},
-    "embeds": [
-            {
-            "description": content,
-            "color": hex_to_int(accent_color),
-            }
-        ],
+        "username": username,
+        "avatar_url": avatar_url,
+        "allowed_mentions": {"parse": []},
     }
+
+    if style == "ansi":
+        payload["content"] = normalize_ansi_text(content)
+
+    elif style == "plain":
+        payload["content"] = content
+
+    else:
+        payload["embeds"] = [
+            {
+                "description": content,
+                "color": hex_to_int(accent_color),
+            }
+        ]
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=payload) as resp:
@@ -123,17 +132,35 @@ async def setup_hook():
 
 
 @bot.tree.command(name="vi", description="Send a message as a configured VI.")
-@app_commands.describe(vi="Which VI identity to use", message="What should the VI say?")
-async def vi(interaction: discord.Interaction, vi: str, message: str):
-
+@app_commands.describe(
+    vi="Which VI identity to use",
+    message="What should the VI say?",
+    style="How should the message be formatted?",
+)
+@app_commands.choices(
+    style=[
+        app_commands.Choice(name="Embed", value="embed"),
+        app_commands.Choice(name="Plain markdown", value="plain"),
+        app_commands.Choice(name="ANSI colour block", value="ansi"),
+    ]
+)
+async def vi(
+    interaction: discord.Interaction,
+    vi: str,
+    message: str,
+    style: str = "embed",
+):
     if not guild_allowed(interaction.guild_id):
         return await interaction.response.send_message(
             "This bot is not authorized for this server.",
             ephemeral=True,
         )
-    
+
     if interaction.guild is None or not isinstance(interaction.user, discord.Member):
-        return await interaction.response.send_message("Use this in a server channel.", ephemeral=True)
+        return await interaction.response.send_message(
+            "Use this in a server channel.",
+            ephemeral=True,
+        )
 
     if not user_is_sl(interaction.user):
         return await interaction.response.send_message(
@@ -158,29 +185,44 @@ async def vi(interaction: discord.Interaction, vi: str, message: str):
         thread_id = channel.id
         base_channel = channel.parent
         if base_channel is None:
-            return await interaction.response.send_message("This thread has no parent channel?", ephemeral=True)
+            return await interaction.response.send_message(
+                "This thread has no parent channel?",
+                ephemeral=True,
+            )
     else:
         base_channel = channel
 
     if not isinstance(base_channel, discord.TextChannel):
-        return await interaction.response.send_message("Unsupported channel type.", ephemeral=True)
+        return await interaction.response.send_message(
+            "Unsupported channel type.",
+            ephemeral=True,
+        )
 
     await interaction.response.defer(ephemeral=True)
 
     try:
         webhook_url = await ensure_channel_webhook_url(base_channel)
-        await post_via_webhook(
-        webhook_url=webhook_url,
-        content=message,
-        username=persona["name"],
-        avatar_url=persona.get("avatarUrl"),
-        thread_id=thread_id,
-        accent_color=persona.get("accentColor"),
-    )
 
-        await interaction.followup.send(f"Sent as **{persona['name']}**.", ephemeral=True)
+        await post_via_webhook(
+            webhook_url=webhook_url,
+            content=message,
+            username=persona["name"],
+            avatar_url=persona.get("avatarUrl"),
+            thread_id=thread_id,
+            accent_color=persona.get("accentColor"),
+            style=style,
+        )
+
+        await interaction.followup.send(
+            f"Sent as **{persona['name']}** using `{style}` style.",
+            ephemeral=True,
+        )
+
     except Exception as e:
-        await interaction.followup.send(f"Failed to send: {e}", ephemeral=True)
+        await interaction.followup.send(
+            f"Failed to send: {e}",
+            ephemeral=True,
+        )
 
 
 @vi.autocomplete("vi")
@@ -225,6 +267,23 @@ def resolve_persona_id(value: str) -> str | None:
                 return persona_id
 
     return None
+
+def normalize_ansi_text(text: str) -> str:
+    safe = text or ""
+
+    safe = safe.replace("\\u001b", "\u001b")
+    safe = safe.replace("\\x1b", "\u001b")
+
+    safe = safe.replace("```", "``\u200b`")
+
+    if safe.lower().startswith("ansi "):
+        safe = safe[5:]
+
+    stripped = safe.strip()
+    if stripped.startswith("```ansi"):
+        return stripped
+
+    return f"```ansi\n{safe}\n```"
 
 
 if __name__ == "__main__":
